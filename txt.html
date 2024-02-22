@@ -1,0 +1,54 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>File Uploader</title>
+</head>
+<body>
+    test
+    <h2>Upload a File</h2>
+    <input type="file" id="fileInput">
+    <button onclick="convertToBase64()">Convert to Base64</button>
+    <button type="submit">Upload</button>
+
+    <script>
+        function convertToBase64() {
+            const fileInput = document.getElementById('fileInput');
+            const file = fileInput.files[0];
+
+            if (!file) {
+                alert('Please select a file.');
+                return;
+            }
+
+            console.log("file", file);
+
+            const reader = new FileReader();
+
+            reader.onload = function(e) {
+                const base64String = e.target.result.split(',')[1];
+                document.getElementById('base64Output').innerText = base64String;
+
+                const url = "http://127.0.0.1:3000/upload"
+
+               fetch(url, {
+                    method: 'POST',
+                    headers: {  
+                        'Content-Type':'application/json'
+                    },
+                    body: JSON.stringify({
+                        imageData: base64String,
+                        processData: false
+                    })
+                })
+                .then(response => response.json())
+                .then(data => console.log(data))
+                .catch(error => console.error('Error:', error));
+            };
+
+            reader.readAsDataURL(file);
+        }
+    </script>
+    <div id="base64Output"></div>
+</body>
+</html>
